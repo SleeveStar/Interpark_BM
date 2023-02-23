@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration
+PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-config.dtd">
+
+<configuration>
+	<!-- 별칭 환경을 설정한다. -->
+	<typeAliases>
+		<!-- DeptDTO 클래스에 대한 별칭을 설정한다. -->
+		<typeAlias alias="ShoppingCartDTO"
+			type="spring.project.interpark.shoppingcart.ShoppingCartDTO" />
+
+		<typeAlias alias="ProductDTO"
+			type="spring.project.interpark.product.ProductDTO" />
+
+		<typeAlias alias="PagingDTO"
+			type="spring.project.interpark.paging.PagingDTO" />
+
+		<typeAlias alias="TicketDTO"
+			type="spring.project.interpark.ticket.dto.TicketDTO" />
+
+		<typeAlias alias="BookerDTO"
+			type="spring.project.interpark.ticket.dto.BookerDTO" />
+
+		<typeAlias alias="CustomerDTO"
+			type="spring.project.interpark.customer.dto.CustomerDTO" />
+
+		<typeAlias alias="PageDTO"
+			type="spring.project.interpark.page.dto.PageDTO" />
+
+		<typeAlias alias="ReplyDTO"
+			type="spring.project.interpark.reply.dto.ReplyDTO" />
+
+		<typeAlias alias="AddressDTO"
+			type="spring.project.interpark.mypage.dto.AddressDTO" />
+
+
+	</typeAliases>
+</configuration>
+

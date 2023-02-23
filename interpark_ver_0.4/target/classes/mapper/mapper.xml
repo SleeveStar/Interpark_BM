@@ -1,0 +1,438 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="spring.project.interpark">
+
+	<select id="selectCartAll" resultType="ShoppingCartDTO">
+		select productnumber, productname, price, seller, quantity,
+		discountprice, shipping, regdate from ShoppingCart
+	</select>
+
+
+	<!-- 페이징처리 -->
+
+	<select id="ListCount" resultType="int">
+	<![CDATA[
+		select count(productnumber) from product where productnumber > 0
+	]]>
+
+	</select>
+
+	<!-- 개별 컬럼값을 조회하고 조회할 파라미터와 결과 저장은 DeptDTO 클래스로 설정한다. -->
+
+	<select id="selectProductAllPage" resultType="ProductDTO"
+		parameterType="PagingDTO">
+		<!-- select productnumber, productname, price, seller, quantity, -->
+		<!-- discountPrice, -->
+		<!-- shipping from product -->
+
+		select productnumber, productname, price, seller, quantity, regdate,
+		shipping, discountprice
+		from (
+		select productnumber, productname, price,
+		seller, quantity, regdate, shipping, discountprice,
+		row_number()
+		over(order by regdate desc) as rnum
+		from product) mb
+		where rnum between
+		#{rowStart} and #{rowEnd}
+		order by regdate
+		desc
+
+		<!-- select deptno, dname, loc from dept -->
+	</select>
+
+	<select id="selectProductAll" resultType="ProductDTO">
+		select productnumber, productname, price, seller, quantity,
+		discountPrice,
+		shipping from product
+
+		<!-- select productnumber, productname, price, seller, quantity -->
+		<!-- from ( -->
+		<!-- select productnumber, productname, price, seller, quantity, -->
+		<!-- row_number() over(order by productnumber desc) as rnum -->
+		<!-- from product) mb -->
+		<!-- where rnum between #{rowStart} and #{rowEnd} -->
+		<!-- order by productnumber -->
+		<!-- desc -->
+
+		<!-- select deptno, dname, loc from dept -->
+	</select>
+
+	<select id="selectProductDetail" resultType="ProductDTO">
+		select productnumber, productname, price, seller, quantity,
+		discountPrice,
+		shipping from product
+		where productnumber =
+		#{productnumber}
+		<!-- select deptno, dname, loc from dept -->
+	</select>
+
+
+	<!-- 컬럼값을 입력하고 입력할 파라미터는 DeptDTO 클래스로 설정한다. -->
+	<insert id="insertCart" parameterType="hashMap">
+
+		{call
+		declare
+		begin
+
+		insert
+		into ShoppingCart
+		select productnumber, productName,
+		price, seller,
+		quantity, discountPrice,
+		shipping, regdate
+		from product
+		where
+		productnumber =
+		#{productnumber};
+
+		update ShoppingCart set quantity = #{quantity}
+		where productnumber = #{productnumber};
+
+		end
+		}
+	</insert>
+
+
+	<!-- 컬럼값을 수정하고 수정할 파라미터는 DeptDTO 클래스로 설정한다. -->
+
+	<update id="updateCart" parameterType="hashMap">
+		update ShoppingCart set
+		quantity = #{quantity}
+		where productnumber = #{num}
+	</update>
+
+
+	<!-- 컬럼값을 삭제하고 삭제할 파라미터는 DeptDTO 클래스로 설정한다. -->
+
+	<delete id="deleteCart" parameterType="ShoppingCartDTO">
+		delete from ShoppingCart
+		where
+		productnumber = #{num}
+	</delete>
+
+	<!--아래에는 영훈이형 파트 -->
+
+	<select id="selectAll" resultType="ProductDTO">
+		select
+		productnumber,
+		productname, price, seller, quantity, shipping, discountprice,
+		regdate
+		from product
+		order by regdate desc
+	</select>
+
+	<select id="productselectdetail" parameterType="ProductDTO"
+		resultType="ProductDTO">
+		select
+		productnumber, productname, price, seller, quantity,
+		shipping, discountprice,
+		regdate
+		from product
+		where
+		productnumber =
+		#{productnumber}
+	</select>
+
+	<insert id="productinsert" parameterType="ProductDTO">
+		insert
+		into product
+		(productnumber, productname, price, seller, quantity,
+		shipping,
+		discountprice)
+		values(#{productnumber}, #{productName}, #{price},
+		#{seller}, #{quantity}, #{shipping},
+		#{discountPrice})
+	</insert>
+
+	<update id="productupdate" parameterType="ProductDTO">
+		update
+		product set
+		productname=#{productname}, price=#{price}, seller=#{seller},
+		quantity=#{quantity}, shipping=#{shipping},
+		discountprice=#{discountprice}
+		where productnumber=#{productnumber}
+	</update>
+
+	<delete id="productdelete" parameterType="ProductDTO">
+		delete
+		from product
+		where productnumber = #{productnumber}
+	</delete>
+
+	<!-- 수빈씨 영역 -->
+
+	<select id="ticketSelectAll" resultType="TicketDTO">
+		select showname,
+		showloc, to_char(showperiodst,'yy-mm-dd') showperiodst ,
+		to_char(showperioden,'yy-mm-dd') showperioden from ticket
+	</select>
+
+	<select id="ticketSelect" parameterType="TicketDTO"
+		resultType="TicketDTO">
+		select showname, showdate, showloc, showinfo, ticketprice,
+		ticketqty,
+		to_char(showperiodst,'yy-mm-dd') showperiodst ,
+		to_char(showperioden,'yy-mm-dd') showperioden from ticket
+		where
+		showname = #{showname}
+	</select>
+
+	<insert id="ticketInsert" parameterType="TicketDTO">
+		insert into ticket
+		(showname, showloc, showinfo, ticketprice, ticketqty,
+		showperiodst,
+		showperioden)
+		values(#{showname}, #{showloc}, #{showinfo},
+		#{ticketprice}, #{ticketqty},
+		to_date(#{showperiodst}, 'yyyy-mm-dd'),
+		to_date(#{showperioden},
+		'yyyy-mm-dd'))
+	</insert>
+
+	<update id="ticketUpdate" parameterType="TicketDTO">
+		update ticket set
+		showloc = #{showloc}, showinfo = #{showinfo}, ticketprice
+		=
+		#{ticketprice}, ticketqty = #{ticketqty}, showperiodst =
+		#{showperiodst}, showperioden = #{showperioden}
+		where showname =
+		#{showname}
+	</update>
+
+	<delete id="ticketDelete" parameterType="TicketDTO">
+		delete from ticket
+		where
+		showname = #{showname}
+	</delete>
+
+
+	<select id="bookerSelectAll" resultType="BookerDTO">
+		select showname,
+		to_char(showdate,'yy-mm-dd') showdate, showloc, showseat,
+		ticketprice
+		from booker
+	</select>
+
+	<select id="bookerSelect" resultType="BookerDTO">
+		select * from booker
+		where
+		showname = #{showname}
+	</select>
+
+	<insert id="bookerInsert" parameterType="BookerDTO">
+		insert into booker
+		(showname, showdate, showloc, showinfo, ticketprice,
+		ticketqty,
+		showperiodst, showperioden, showseat)
+		values(#{showname}, #{showdate},
+		#{showloc}, #{showinfo}, #{ticketprice}, #{ticketqty},
+		#{showperiodst}, #{showperioden}, #{showseat})
+	</insert>
+
+	<update id="bookerUpdate" parameterType="BookerDTO">
+		update booker set
+		showdate=#{showdate}, showseat=#{showseat}
+		where showname=#{showname}
+	</update>
+
+	<delete id="bookerDelete" parameterType="BookerDTO">
+		delete from booker
+		where
+		showname = #{showname}
+	</delete>
+
+	<!-- 태호 부분 -->
+	<select id="selectboardAll" resultType="CustomerDTO"
+		parameterType="CustomerDTO">
+		SELECT num,
+		anytype,
+		TITLE,
+		CONTENT,
+		writedate
+		FROM (
+		SELECT
+		num,
+		anytype,
+		TITLE,
+		CONTENT,
+		writedate,
+		ROW_NUMBER() OVER(ORDER BY num
+		DESC) AS RNUM
+		FROM CUSTOMER
+		) MP
+		WHERE RNUM BETWEEN #{rowStart} AND
+		#{rowEnd}
+		ORDER BY num DESC
+
+	</select>
+
+	<select id="selectboard" parameterType="CustomerDTO"
+		resultType="CustomerDTO">
+		select num, anytype, title, content, writedate from
+		customer
+		where num = #{num}
+	</select>
+
+	<insert id="insertboard" parameterType="CustomerDTO">
+		insert into customer
+		(num,
+		anytype, title, content, writedate)
+		values(shin.nextval,
+		#{anytype},
+		#{title}, #{content}, to_date(sysdate,'yyyy.mm.dd'))
+	</insert>
+
+	<update id="updateboard" parameterType="CustomerDTO">
+		update customer set title
+		=
+		#{title}, content=#{content}
+		where num = #{num}
+	</update>
+
+	<delete id="deleteboard" parameterType="CustomerDTO">
+		delete from customer
+		where num
+		= #{num}
+	</delete>
+
+	<select id="listCountboard" resultType="int">
+	<![CDATA[
+		SELECT COUNT(num)
+		  FROM customer
+		 WHERE num > 0
+	]]>
+	</select>
+
+
+	<!-- 댓글 조회 -->
+	<select id="readReply" resultType="ReplyDTO">
+		SELECT
+		renum, retitle,
+		recontent, redate
+		FROM reply
+		WHERE num = #{num}
+	</select>
+
+	<!-- 댓글 작성 -->
+	<insert id="replywrite" parameterType="ReplyDTO">
+		insert into
+		Reply(num,
+		renum, retitle, recontent)
+		values(#{num}, shin2.nextval, #{retitle},
+		#{recontent})
+	</insert>
+
+	<!-- 댓글 수정 -->
+	<update id="replyupdate" parameterType="ReplyDTO">
+		update reply set
+		recontent = #{recontent}
+		where renum = #{renum}
+		and num = #{num}
+	</update>
+
+	<!-- 댓글 삭제 -->
+	<delete id="replyDelete" parameterType="ReplyDTO">
+		delete from reply
+		where
+		renum = #{renum}
+		and num = ${num}
+	</delete>
+
+
+
+	<!-- 근성 -->
+	<select id="selectAllAddress" resultType="AddressDTO">
+		select num,
+		addressname, address, phone from ADDRESS
+	</select>
+
+	<select id="selectAddress" parameterType="AddressDTO"
+		resultType="AddressDTO">
+		select num, addressname, address, phone from ADDRESS
+		where
+		num = #{num}
+	</select>
+
+	<insert id="insertAddress" parameterType="AddressDTO">
+		insert into ADDRESS
+		(num, addressname, address, phone)
+		values(seq.nextval, #{addressname},
+		#{address}, #{phone})
+	</insert>
+
+	<update id="updateAddress" parameterType="AddressDTO">
+		update ADDRESS set
+		addressname = #{addressname}, address = #{address}, phone = #{phone}
+		where num = #{num}
+	</update>
+
+	<delete id="deleteAddress" parameterType="AddressDTO">
+		delete from ADDRESS
+		where num = #{num}
+	</delete>
+
+	<!-- resultType : select 된 데이터를 반환할 (그릇)을 정해주는것 아래의 코드같은경우엔 AddressDTO 객체에 
+		담긴다 -->
+	<!-- parameterType : 자바에서 String 값이 들어올거란걸 알려준다 -->
+
+	<select id="addresslistPage" resultType="AddressDTO"
+		parameterType="spring.project.interpark.mypage.page.Criteria">
+		select num, addressname, address, phone
+		from (
+		select num,
+		addressname, address, phone,
+		row_number() over(order by num desc) as
+		rNum
+		from address
+		) mb
+		where rNum between #{rowStart} and #{rowEnd}
+		order
+		by num desc
+	</select>
+
+	<select id="addresslistCount" resultType="int">
+    <![CDATA[
+    	select	count(num)
+    		from address
+    			where num > 0
+    ]]>
+	</select>
+
+	<!-- 검색 -->
+	<select id="addresslistSearch" resultType="AddressDTO"
+		parameterType="spring.project.interpark.mypage.search.SearchCriteria">
+		select num, addressname, address, phone
+		from (
+		select num,
+		addressname,address, phone,
+		row_number() over(order by num desc) as
+		rNum
+		from
+		address
+		<include refid="searches"></include>
+		) mb
+		where rNum between #{rowStart} and #{rowEnd}
+		order by num desc
+	</select>
+
+	<sql id="searches">
+		<if test="searchType != null">
+			<if test="searchType == 'n'.toString()">where addressname like '%' || #{keyword} || '%'</if>
+			<if test="searchType == 'a'.toString()">where address like '%' || #{keyword} || '%'</if>
+		</if>
+	</sql>
+
+	<select id="addresscountSearch" resultType="int">
+	<![CDATA[
+    	select	count(num)
+    		from address
+    			where num > 0 ]]>
+	</select>
+</mapper>
+
+
+
